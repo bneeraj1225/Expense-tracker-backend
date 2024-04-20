@@ -1,7 +1,6 @@
 // routes/userRoutes.js
 
 const express = require('express');
-const bcrypt = require('bcrypt');
 const router = express.Router();
 var jsforce = require('jsforce'); //Adding JsForce
 const jwt = require('jsonwebtoken'); // Import JWT
