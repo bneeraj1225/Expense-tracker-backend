@@ -55,12 +55,12 @@ connection.login(username, password, function(err, userInfo) {
                         date: result.records[i].Date__c
                     });
                 }
-                connection.query(`SELECT Id, Expense_Amount__c FROM User__c WHERE Email__c = '${email}'`, function(err, result) {
+                connection.query(`SELECT Id, Expense_Amount__c, Month__c FROM User__c WHERE Email__c = '${email}'`, function(err, result) {
                     if(err){
                         return res.json({success: false, message: 'Internal Server Error'});
                     }
                     const record = result.records[0];
-                    return res.json({success: true, expenseAmount: record.Expense_Amount__c, expenses:expenses});
+                    return res.json({success: true, expenseAmount: record.Expense_Amount__c, expenses:expenses, month: record.Month__c});
                 });
             });
         } catch (error) {
