@@ -9,10 +9,6 @@ const {expressjwt: expressJwt} = require('express-jwt');
 const username = process.env.SALESFORCE_USER_NAME;
 const password = process.env.SALESFORCE_PASSWORD + process.env.SALESFORCE_SECURITY_TOKEN;
 
-const Expense = require('../models/expense');
-const mongoose = require('../server'); // Import Mongoose instance from app.js
-const { connect } = require('mongoose');
-
 require('dotenv').config();
 
 const secretkey = process.env.SECRET_KEY;

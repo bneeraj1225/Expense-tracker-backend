@@ -4,7 +4,6 @@ const express = require('express');
 const router = express.Router();
 var jsforce = require('jsforce'); //Adding JsForce
 const jwt = require('jsonwebtoken'); // Import JWT
-const User = require('../models/user');
 require('dotenv').config(); // Load environment variables from .env file
 
 const username = process.env.SALESFORCE_USER_NAME;
