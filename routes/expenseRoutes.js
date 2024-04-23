@@ -55,7 +55,46 @@ connection.login(username, password, function(err, userInfo) {
                         date: result.records[i].Date__c
                     });
                 }
-                return res.json(expenses);
+                connection.query(`SELECT Id, Expense_Amount__c FROM User__c WHERE Email__c = '${email}'`, function(err, result) {
+                    if(err){
+                        return res.json({success: false, message: 'Internal Server Error'});
+                    }
+                    const record = result.records[0];
+                    return res.json({success: true, expenseAmount: record.Expense_Amount__c, expenses:expenses});
+                });
+            });
+        } catch (error) {
+            res.status(400).send(error.message);
+        }
+    });
+
+    router.get('/fetchExpensesformonth/email=:email', jwtMW , async (req, res) => {
+        try {
+            const email = req.params.email;
+
+            connection.query(`SELECT Id, Title__c, Category__c, Price__c, Expected_Price__c, Email__c, Date__c FROM Expense__c WHERE Email__c = '${email}' order by Date__c desc`, function(err, result) {
+                if (err) { 
+                    return res.send(400).send(express.response)
+                }
+                let expenses = [];
+                for(let i=0; i<result.records.length; i++){
+                    expenses.push({
+                        _id: result.records[i].Id,
+                        title: result.records[i].Title__c,
+                        category: result.records[i].Category__c,
+                        price: result.records[i].Price__c,
+                        expectedPrice: result.records[i].Expected_Price__c,
+                        email: result.records[i].Email__c,
+                        date: result.records[i].Date__c
+                    });
+                }
+                connection.query(`SELECT Id, Month__c, Expense_Amount__c FROM User__c WHERE Email__c = '${email}'`, function(err, result) {
+                    if(err){
+                        return res.json({success: false, message: 'Internal Server Error'});
+                    }
+                    const record = result.records[0];
+                    return res.json({success: true, month: record.Month__c, expenses:expenses, amount: record.Expense_Amount__c});
+                });
             });
         } catch (error) {
             res.status(400).send(error.message);
@@ -126,6 +165,28 @@ connection.login(username, password, function(err, userInfo) {
                 }
                 
                 return res.status(200).json({ success: true, _id: result.id });
+            });
+        } catch (error) {
+            res.status(400).send(error.message);
+        }
+    });
+
+    router.post('/addMonthlyExpenses/:userid', jwtMW, async (req, res) => {
+        try {
+            const { amount } = req.body;
+            const userid = req.params.userid;
+            const expense = {
+                'Month__c': new Date().getMonth() + 1,
+                'Expense_Amount__c': amount
+            };
+            connection.sobject('User__c')
+            .find({'Id': userid})
+            .update(expense, function(err, result) {
+                if (err) {
+                    return res.status(404).json({ success: false, message: 'Expense not found' });
+                } else {
+                    return res.json({ success: true});
+                }
             });
         } catch (error) {
             res.status(400).send(error.message);
